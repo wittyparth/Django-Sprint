@@ -12,16 +12,20 @@ from rest_framework import filters
 from rest_framework import viewsets
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db import models
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from django.utils import timezone
+from .permissions import IsOwnerOrReadOnly,IsAuthorOrReadOnly
 
 
 class BlogPostViewSet(ModelViewSet):
     queryset = BlogPost.objects.all()  # What data it operates on
-    serializer_class = BlogPostSerializer
+    serializer_class = BlogPostSerializer # Whivh serializer it uses
     permission_classes = [IsAuthenticatedOrReadOnly,IsAuthorOrReadOnly]
-    filter_backends = [filters.SearchFilter,DjangoFilterBackend]
+    filter_backends = [filters.SearchFilter,DjangoFilterBackend,filters.OrderingFilter]
     search_fields = ['title', 'content']
     filterset_fields = ['author','created_at','tags']
-    ordering_fields = ['created_at', 'title']
+    ordering_fields = ['created_at', 'title','like_count']
     ordering = ['-created_at']
     lookup_field = 'slug'
 
@@ -29,13 +33,24 @@ class BlogPostViewSet(ModelViewSet):
         serializer.save(author=self.request.user)
     def get_serializer_context(self):
         return {'request': self.request}
+    # def get_queryset(self):
+    #     user = self.request.user
+    #     if user.is_authenticated:
+    #         return BlogPost.objects.filter(models.Q(status='published') | models.Q(author=user))
+    #     return BlogPost.objects.filter(status='published')
     def get_queryset(self):
-        user = self.request.user
-        if user.is_authenticated:
-            return BlogPost.objects.filter(models.Q(status='published') | models.Q(author=user))
-        return BlogPost.objects.filter(status='published')
+        qs = BlogPost.objects.all().order_by('-publish_date', '-created_at')
 
+        if self.action == 'list':
+            # Only return published posts
+            return qs.filter(
+                status='published',
+                publish_date__lte=timezone.now()
+            )
 
+        return qs  # Allow admin to retrieve draft/post
+
+@method_decorator(csrf_exempt, name='dispatch')
 class RegisterView(APIView):
     def post(self, request):
         serializer = UserRegisterSerializer(data=request.data)
@@ -58,6 +73,13 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+    def get_queryset(self):
+        queryset = Comment.objects.all()
+        post_id = self.request.query_params.get('post')
+        if post_id:
+            queryset = queryset.filter(post_id=post_id, parent=None)
+        return queryset
 
 class LikeViewSet(viewsets.ModelViewSet):
     queryset = Like.objects.all()
@@ -86,3 +108,16 @@ class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+
+from rest_framework import viewsets, permissions
+from .models import Profile
+from .serializers import ProfileSerializer
+
+class ProfileViewSet(viewsets.ModelViewSet):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly]
+
+
+    def perform_update(self, serializer):
+        serializer.save(user=self.request.user)
