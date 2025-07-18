@@ -14,6 +14,8 @@ class BlogPostSerializer(serializers.ModelSerializer):
     tag_ids = serializers.PrimaryKeyRelatedField(queryset=Tag.objects.all(), many=True, write_only=True)
     like_count = serializers.SerializerMethodField()
     liked_by_me = serializers.SerializerMethodField()
+    image = serializers.ImageField(required=False)
+
 
     def get_like_count(self, obj):
         return obj.likes.count()
@@ -65,6 +67,12 @@ class UserSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     author_username = serializers.ReadOnlyField(source='author.username')
+    replies = serializers.SerializerMethodField()
+
+    def get_replies(self, obj):
+        if obj.replies.exists():
+            return CommentSerializer(obj.replies.all(), many=True, context=self.context).data
+        return []
 
     class Meta:
         model = Comment
@@ -78,4 +86,23 @@ class LikeSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'user', 'created_at']
 
 
+from rest_framework import serializers
+from .models import Profile
 
+class ProfileSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username', read_only=True)
+    email = serializers.EmailField(source='user.email', read_only=True)
+
+    class Meta:
+        model = Profile
+        fields = [
+            'id',
+            'username',
+            'email',
+            'avatar_url',
+            'bio',
+            'website',
+            'location',
+            'created_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'username', 'email']
