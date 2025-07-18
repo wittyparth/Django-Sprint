@@ -25,8 +25,6 @@ class BlogPost(models.Model):
         ('draft', 'Draft'),
         ('published', 'Published')
     )
-
-    ...
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
 
     def save(self, *args, **kwargs):
