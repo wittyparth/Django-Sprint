@@ -20,6 +20,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+AUTH_USER_MODEL = 'blog.User'
 
 
 # Quick-start development settings - unsuitable for production
@@ -45,9 +46,23 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'blog.apps.BlogConfig', #
     "django_filters",#
-    "corsheaders" #
+    "corsheaders",
+    'cloudinary',
+    'cloudinary_storage',
 ]
 
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'doeypphuv',
+    'API_KEY': '899722918162822',
+    'API_SECRET': 'CxVWNtx6EQGT4EX2uc5zEihgVz8',
+}
+# Ensure Cloudinary SDK sees credentials in development
+os.environ['CLOUDINARY_CLOUD_NAME'] = CLOUDINARY_STORAGE['CLOUD_NAME']
+os.environ['CLOUDINARY_API_KEY'] = CLOUDINARY_STORAGE['API_KEY']
+os.environ['CLOUDINARY_API_SECRET'] = CLOUDINARY_STORAGE['API_SECRET']
+print("Cloudinary settings:", CLOUDINARY_STORAGE)
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -149,15 +164,26 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
         'rest_framework.filters.OrderingFilter',
-    ]
+    ],
+    'EXCEPTION_HANDLER': 'config.utils.custom_exception_handler'
 }
 
 from datetime import timedelta
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),      # default: 5 mins
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60000),      # default: 5 mins
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),         # default: 1 day
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
+
+# settings.py
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'parthasaradhimunakala@gmail.com'         # The email address you're sending from
+EMAIL_HOST_PASSWORD = 'ikdrlgsvdaqnzyvv'   # Gmail app password (not your real password)
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

@@ -4,3 +4,5 @@ djangorestframework-simplejwt
 django-filter
 django-cors-headers
 pillow
+cloudinary 
+django-cloudinary-storage
