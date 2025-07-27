@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import BlogPost,Comment,Like,Tag,Category
+from .models import BlogPost,Comment,Like,Tag
 from django.contrib.auth.models import User
 
 class TagSerializer(serializers.ModelSerializer):

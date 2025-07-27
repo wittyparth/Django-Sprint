@@ -313,9 +313,3 @@ def admin_user_summary(request):
     data = UserSummarySerializer(users, many=True).data
     return Response({'users': data})
 
-
-    
-
-
-
-# Use ModelViewSet to create an API for the Note model. Implement methods to allow users to create, view, update, and delete notes. Use perform_create() to assign the currently logged-in user as the owner.

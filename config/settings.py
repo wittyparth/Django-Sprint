@@ -44,11 +44,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'blog.apps.BlogConfig', #
+    # 'blog.apps.BlogConfig', #
     "django_filters",#
     "corsheaders",
     'cloudinary',
     'cloudinary_storage',
+    "blog"
 ]
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
@@ -58,11 +59,11 @@ CLOUDINARY_STORAGE = {
     'API_KEY': '899722918162822',
     'API_SECRET': 'CxVWNtx6EQGT4EX2uc5zEihgVz8',
 }
-# Ensure Cloudinary SDK sees credentials in development
-os.environ['CLOUDINARY_CLOUD_NAME'] = CLOUDINARY_STORAGE['CLOUD_NAME']
-os.environ['CLOUDINARY_API_KEY'] = CLOUDINARY_STORAGE['API_KEY']
-os.environ['CLOUDINARY_API_SECRET'] = CLOUDINARY_STORAGE['API_SECRET']
-print("Cloudinary settings:", CLOUDINARY_STORAGE)
+# # Ensure Cloudinary SDK sees credentials in development
+# os.environ['CLOUDINARY_CLOUD_NAME'] = CLOUDINARY_STORAGE['CLOUD_NAME']
+# os.environ['CLOUDINARY_API_KEY'] = CLOUDINARY_STORAGE['API_KEY']
+# os.environ['CLOUDINARY_API_SECRET'] = CLOUDINARY_STORAGE['API_SECRET']
+# print("Cloudinary settings:", CLOUDINARY_STORAGE)
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',

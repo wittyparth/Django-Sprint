@@ -5,7 +5,6 @@ from django.utils.text import slugify
 from django.utils import timezone
 from django.core.validators import FileExtensionValidator
 
-# Create your models here.
 
 
 class Tag(models.Model):
