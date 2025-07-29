@@ -20,7 +20,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-AUTH_USER_MODEL = 'blog.User'
+AUTH_USER_MODEL = 'users.User'
 
 
 # Quick-start development settings - unsuitable for production
@@ -44,12 +44,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # 'blog.apps.BlogConfig', #
     "django_filters",#
     "corsheaders",
     'cloudinary',
     'cloudinary_storage',
-    "blog"
+    "users.apps.UsersConfig",
+    "posts",
+    "comments",
+    "likes",
+    "tags",
+    "categories",
+    "bookmarks",
 ]
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
@@ -159,7 +164,7 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
     ),
-    'DEFAULT_PAGINATION_CLASS': 'blog.pagination.CustomPagination',
+    'DEFAULT_PAGINATION_CLASS': 'config.pagination.CustomPagination',
     'PAGE_SIZE': 5,
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
